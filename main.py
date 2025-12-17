@@ -1,14 +1,50 @@
+# Library json untuk manipulasi data/file dengan ekstensi .json, os untuk fungsi clear screen
 import json, os
 
+# Nama file yang akan menampung semua data dari program
 FILE = "data_mahasiswa.json"
 
-def AmbilData():
-    return json.load(open(FILE)) if os.path.exists(FILE) else {}
+# Membuat file baru jika tidak ada file json
+def BuatFile():
+    dataKosong = {}
 
+    """
+    Pada bagian ini, kita akan membuka file dengan fungsi open() dengan 2 argumen
+    yaitu FILE untuk direktori file dan 'w' untuk write/tulis file.
+    File tersebut dijadikan sebagai variabel json_file yang dijadikan sebagai
+    argumen untuk json.dump().
+    json.dump() akan menulis ke dalam file dimana:
+    argumen ke-1 adalah datanya
+    argumen ke-2 adalah variabel file tadi
+    dan argumen ke-3 adalah indentasi sebanyak 4 spasi agar bisa dibaca dengan mudah oleh manusia
+    """
+    with open (FILE, 'w') as json_file:
+        json.dump(dataKosong, json_file, indent=4)
+
+# Mengambil data dari file json, jika nama file yang dicari tidak ada maka akan membuat/generate file secara otomatis
+def AmbilData():
+    """
+    Melakukan pengecekan apakah file dengan lokasi direktori FILE atau data_mahasiswa.json
+    Jika ada maka load file dengan fungsi json.load()
+    Jika tidak ada maka buat file dengan fungsi BuatFile() dan load filenya
+    """
+    if os.path.exists(FILE):
+        return json.load(open(FILE))
+    else:
+        BuatFile()
+        return json.load(open(FILE))
+
+# Menyimpan data baru ke file data_mahasiswa.json
 def SimpanData(data):
+    # Menyimpan data ke file dengan argumen 'w' atau menulis data ke dalam file.
     json.dump(data, open(FILE, 'w'), indent=4)
 
+# Menghapus data dari file data_mahasiswa.json
 def HapusData(nim, db):
+    """
+    Menghapus salah satu data pada file data_mahasiswa.json dimana kriterianya adalah nim
+    dengan menggunakan del. Setelah itu baru simpan perubahan dengan fungsi SimpanData()
+    """
     if nim in db:
         if input(f"Yakin ingin menghapus semua data NIM {nim}? (y/n): ").lower() == 'y':
             del db[nim]
@@ -17,14 +53,26 @@ def HapusData(nim, db):
     else:
         input(f"\n[GAGAL] NIM {nim} tidak ditemukan, tidak ada yang dihapus. Enter...")
 
+# Menambah data baru ke file data_mahasiswa.json
 def TambahData(nim, db):
     if nim not in db:
+        """
+        Menambah data baru sebagai Dictionary dengan keyword nim dan value awal-nya adalah "NIM_ONLY"
+        Lalu simpan penambahan data tersebut ke file data_mahasiswa.json
+        """
         db[nim] = "NIM_ONLY"
         SimpanData(db)
         input(f"\n[SUKSES] NIM {nim} berhasil didaftarkan! Enter...")
     else:
         input(f"\n[PERINGATAN] NIM {nim} sudah ada di database! Enter...")
 
+"""
+Melakukan cek apakah inputan dengan kriteria nim yang dituju sudah ada
+di file data_mahasiswa.json. Jika sudah ada maka masuk ke sub-menu
+Biodata untuk nim yang dituju dimana kita bisa mengubah isi biodata,
+mencetak isi biodata, ataupun kembali ke menu utama
+
+"""
 def CekData(nim, db):
     if nim in db:
         input(f"\n[OK] NIM {nim} ditemukan! Tekan Enter untuk lanjut...")
@@ -53,9 +101,11 @@ def CekData(nim, db):
     else:
         input(f"\n[GAGAL] NIM {nim} tidak ditemukan dalam sistem! Enter...")
 
+# Membersihkan layar terminal
 def ClearScreen():
     os.system('cls' if os.name == 'nt' else 'ClearScreen')
 
+# Fungsi utama program untuk menampilkan Menu Utama Data Center kelas 3D
 def main():
     db = AmbilData()
     while True:
@@ -78,5 +128,6 @@ def main():
         elif opt == '4':
             print("Keluar dari sistem..."); break
 
+# Melakukan enkapsulasi program python jika dieksekusi langsung, mirip fungsi main class C++ atau Java
 if __name__ == "__main__":
     main()
